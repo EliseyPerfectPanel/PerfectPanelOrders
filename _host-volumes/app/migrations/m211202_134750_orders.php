@@ -13,17 +13,17 @@ class m211202_134750_orders extends Migration
     public function safeUp()
     {
         $this->createIndex(
-            'service_id_index',
+            'service_id',
             'orders',
             'service_id'
         );
         $this->createIndex(
-            'order_status',
+            'status',
             'orders',
             'status'
         );
         $this->createIndex(
-            'order_mode',
+            'mode',
             'orders',
             'mode'
         );
@@ -32,7 +32,16 @@ class m211202_134750_orders extends Migration
             'orders',
             ['status', 'mode']
         );
-        $this->alterColumn('orders', 'id', $this->primaryKey()->unsigned()->notNull());
+        $this->createIndex(
+            'mode_serviceId',
+            'orders',
+            ['mode', 'service_id']
+        );
+        $this->createIndex(
+            'service_id_status',
+            'orders',
+            ['service_id', 'status']
+        );
 
     }
 
@@ -42,23 +51,30 @@ class m211202_134750_orders extends Migration
     public function safeDown()
     {
         $this->dropIndex(
-            'service_id_index',
+            'service_id',
             'orders'
         );
         $this->dropIndex(
-            'order_status',
+            'status',
             'orders'
         );
         $this->dropIndex(
-            'order_mode',
+            'mode',
             'orders'
         );
         $this->dropIndex(
             'status_mode',
             'orders'
         );
+        $this->dropIndex(
+            'mode_serviceId',
+            'orders'
+        );
+        $this->dropIndex(
+            'service_id_status',
+            'orders'
+        );
 
-        //--TODO: add index
 
         /*$this->dropTable('orders');
         $this->dropTable('services');
