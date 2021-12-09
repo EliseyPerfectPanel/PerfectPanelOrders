@@ -42,33 +42,4 @@ class Services extends \yii\db\ActiveRecord
             'name' => Yii::t('app', 'Name'),
         ];
     }
-
-
-    /**
-     * @return array
-     * Get all uniq services
-     */
-    public function getAllServisesGroupped(yii\db\Query $ordersQuery)
-    {
-        $ordersQuery->select([
-            'COUNT(*)',
-        ]);
-        $ordersQuery->from(['o' => 'orders']);
-        $ordersQuery->andWhere('o.service_id = sw.id');
-        //var_dump($ordersQuery->createCommand()->rawSql);exit;
-        
-
-        $query = (new \yii\db\Query)
-            ->select([
-                'name'  => 'sw.name',
-                'id'    => 'sw.id',
-                'co'    => $ordersQuery,
-            ])
-            ->from(['sw' => 'services'])
-            ->having('co > 0');
-        $query->orderBy('co DESC');
-        //var_dump($query->createCommand()->rawSql);exit;
-
-        return $query->all();
-    }
 }

@@ -32,18 +32,6 @@ class Users extends \yii\db\ActiveRecord
         ];
     }
 
-    public function getOrders()
-    {
-        return $this->hasMany(Orders::class, ['user_id' => 'id']);
-    }
-
-    /**
-     * get user first_name + last_name
-     */
-    public function getUserFio(){
-
-    }
-
     /**
      * {@inheritdoc}
      */

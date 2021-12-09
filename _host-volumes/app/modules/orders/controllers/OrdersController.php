@@ -2,13 +2,14 @@
 
 namespace app\modules\orders\controllers;
 
+use yii;
 use app\modules\orders\models\Orders;
+use app\modules\orders\models\OrdersSearch;
 use app\modules\orders\models\Services;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii;
 
 
 /**
@@ -46,16 +47,15 @@ class OrdersController extends Controller
     public function actionIndex()
     {
         $orders = new Orders();
+
         $ordersSearchModel = new OrdersSearch();
+        $allOrders = $ordersSearchModel->getFilteredOrders();
 
-        $allOrders = $orders->getFilteredOrders($ordersSearchModel);
-
-        //-- передача параметров во вью
+        //-- передача параметров во вью в глобальную видимость
         Yii::$app->getView()->params['statusLabels'] = $orders->statusLabels();
         Yii::$app->getView()->params['modeLabels'] = $orders->modeLabels();
 
-        $services = new Services();
-        $servicesLabels = $services->getAllServisesGroupped(clone $allOrders);
+        $servicesLabels = $ordersSearchModel->getAllServisesGroupped(clone $allOrders);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $allOrders,
