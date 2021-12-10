@@ -25,11 +25,11 @@ class Orders extends \yii\db\ActiveRecord
     public static function statusLabels()
     {
         return [
-            0 => Yii::t('app', 'Pending'),
-            1 => Yii::t('app', 'In progress'),
-            2 => Yii::t('app', 'Completed'),
-            3 => Yii::t('app', 'Canceled'),
-            4 => Yii::t('app', 'Fail')
+            0 => Yii::t('om', 'Pending'),
+            1 => Yii::t('om', 'In progress'),
+            2 => Yii::t('om', 'Completed'),
+            3 => Yii::t('om', 'Canceled'),
+            4 => Yii::t('om', 'Fail')
         ];
     }
 
@@ -40,8 +40,8 @@ class Orders extends \yii\db\ActiveRecord
     public static function modeLabels()
     {
         return [
-            0 => Yii::t('app', 'Manual'),
-            1 => Yii::t('app', 'Auto'),
+            0 => Yii::t('om', 'Manual'),
+            1 => Yii::t('om', 'Auto'),
         ];
     }
 
@@ -71,14 +71,14 @@ class Orders extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'user_id' => Yii::t('app', 'User ID'),
-            'link' => Yii::t('app', 'Link'),
-            'quantity' => Yii::t('app', 'Quantity'),
-            'service_id' => Yii::t('app', 'Service ID'),
-            'status' => Yii::t('app', '0 - Pending, 1 - In progress, 2 - Completed, 3 - Canceled, 4 - Fail'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'mode' => Yii::t('app', '0 - Manual, 1 - Auto'),
+            'id' => Yii::t('om', 'ID'),
+            'user_id' => Yii::t('om', 'User ID'),
+            'link' => Yii::t('om', 'Link'),
+            'quantity' => Yii::t('om', 'Quantity'),
+            'service_id' => Yii::t('om', 'Service ID'),
+            'status' => Yii::t('om', '0 - Pending, 1 - In progress, 2 - Completed, 3 - Canceled, 4 - Fail'),
+            'created_at' => Yii::t('om', 'Created At'),
+            'mode' => Yii::t('om', '0 - Manual, 1 - Auto'),
         ];
     }
 }

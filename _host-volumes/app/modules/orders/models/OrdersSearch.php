@@ -4,10 +4,12 @@ namespace app\modules\orders\models;
 
 
 use yii;
+use yii\base\Model;
 use yii\db\Expression;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
 
-class OrdersSearch extends \yii\base\Model
+class OrdersSearch extends Model
 {
     public $search_type;
     public $search_string;
@@ -29,9 +31,11 @@ class OrdersSearch extends \yii\base\Model
      * @return Query
      */
     public function getFilteredOrders(){
+        
+
         $request = Yii::$app->request;
 
-        $allOrders = (new \yii\db\Query)
+        $allOrders = (new Query)
             ->select([
                 'o.*',
                 's.name',
@@ -76,9 +80,9 @@ class OrdersSearch extends \yii\base\Model
      * @return array
      * Get all uniq services
      */
-    public function getAllServisesGroupped(yii\db\Query $ordersQuery)
+    public function getAllServisesGroupped($ordersQuery)
     {
-        $ordersQuery->select([
+/*        $ordersQuery->select([
             'COUNT(*)',
         ]);
         $ordersQuery->from(['o' => 'orders']);
@@ -95,8 +99,21 @@ class OrdersSearch extends \yii\base\Model
             ])
             ->from(['sw' => 'services'])
             ->having('co > 0')
-            ->orderBy('co DESC');
+            ->orderBy('co DESC');*/
 
-        return $query->all();
+
+        $ordersQuery->select([
+            'co' => 'COUNT(o.service_id)',
+            'name'  => 's.name',
+            'id'    => 'o.service_id'
+        ]);
+
+        $ordersQuery->from(['o' => 'orders']);
+        $ordersQuery->groupBy('o.service_id');
+        //--remove for correct widget
+        ArrayHelper::remove($ordersQuery->where, 'o.service_id');
+        $ordersQuery->orderBy('co');
+
+        return $ordersQuery->all();
     }
 }

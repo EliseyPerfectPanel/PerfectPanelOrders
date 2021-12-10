@@ -5,7 +5,7 @@ use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
-/* @var $model app\modules\orders\controllers\OrdersSearch */
+/* @var $model app\modules\orders\models\OrdersSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 <?php $form = ActiveForm::begin([
@@ -25,14 +25,14 @@ use yii\helpers\ArrayHelper;
     <div class="input-group">
         <?= $form->field($model, 'search_string', ['template' => "{input}"])
             ->textInput()
-            ->input('text', ['placeholder' => 'Search orders', 'class' => 'form-control'])
+            ->input('text', ['placeholder' => Yii::t('om', 'Search orders'), 'class' => 'form-control'])
             ->label(false)
         ?>
         <span class="input-group-btn search-select-wrap">
             <?= $form->field($model, 'search_type', ['template' => "{input}"])->dropDownList([
-                'order_id' => Yii::t('app', 'Order ID'),
-                'link'      => Yii::t('app', 'Link'),
-                'username'  => Yii::t('app', 'Username')
+                'order_id' => Yii::t('om', 'Order ID'),
+                'link'      => Yii::t('om', 'Link'),
+                'username'  => Yii::t('om', 'Username')
             ],['class' => 'form-control search-select'])
                 ->label(false)
             ?>

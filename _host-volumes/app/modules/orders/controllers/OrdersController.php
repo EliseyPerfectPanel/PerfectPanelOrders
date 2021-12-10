@@ -5,7 +5,6 @@ namespace app\modules\orders\controllers;
 use yii;
 use app\modules\orders\models\Orders;
 use app\modules\orders\models\OrdersSearch;
-use app\modules\orders\models\Services;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -46,14 +45,15 @@ class OrdersController extends Controller
      */
     public function actionIndex()
     {
+
         $orders = new Orders();
 
         $ordersSearchModel = new OrdersSearch();
         $allOrders = $ordersSearchModel->getFilteredOrders();
 
         //-- передача параметров во вью в глобальную видимость
-        Yii::$app->getView()->params['statusLabels'] = $orders->statusLabels();
-        Yii::$app->getView()->params['modeLabels'] = $orders->modeLabels();
+        Yii::$app->getView()->params['statusLabels'] = $orders::statusLabels();
+        Yii::$app->getView()->params['modeLabels'] = $orders::modeLabels();
 
         $servicesLabels = $ordersSearchModel->getAllServisesGroupped(clone $allOrders);
 
@@ -153,6 +153,6 @@ class OrdersController extends Controller
             return $model;
         }
 
-        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        throw new NotFoundHttpException(Yii::t('om', 'The requested page does not exist.'));
     }
 }

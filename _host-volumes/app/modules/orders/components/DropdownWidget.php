@@ -36,14 +36,21 @@ class DropdownWidget extends Widget
             $html.='
                 <div class="dropdown">
                   <button class="btn btn-th btn-default dropdown-toggle" type="button" id="dropdownMenu'.$id.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    '.Html::encode(Yii::t('app', $this->label)).'
+                    '.Html::encode(Yii::t('om', $this->label)).'
                     <span class="caret"></span>
                   </button>';
 
             $links = [];
 
             unset($this->url[$this->addGetParam]);
-            $links[] = ['label' => Yii::t('app', $this->allTitle), 'url'   => $this->url];
+            $links[] = [
+                'label' => Yii::t('om', $this->allTitle),
+                'url'   => $this->url,
+                //-- remove active trail from first link
+                'active' => function ($item, $hasActiveChild, $isItemActive, $widget){
+                    return yii::$app->request->get($this->addGetParam)!==NULL?false:true;
+                }
+            ];
 
             foreach ($this->items as $key => $val){
                 $links[] = ['label' => $val, 'url' => ArrayHelper::merge($this->url, [$this->addGetParam => $key])];

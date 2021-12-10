@@ -3,6 +3,7 @@
 namespace app\modules\orders\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "users".
@@ -11,7 +12,7 @@ use Yii;
  * @property string $first_name
  * @property string $last_name
  */
-class Users extends \yii\db\ActiveRecord
+class Users extends ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -38,9 +39,9 @@ class Users extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'first_name' => Yii::t('app', 'First Name'),
-            'last_name' => Yii::t('app', 'Last Name'),
+            'id' => Yii::t('om', 'ID'),
+            'first_name' => Yii::t('om', 'First Name'),
+            'last_name' => Yii::t('om', 'Last Name'),
         ];
     }
 }
