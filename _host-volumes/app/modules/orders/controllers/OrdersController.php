@@ -9,6 +9,7 @@ use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 
 
 /**
@@ -51,6 +52,14 @@ class OrdersController extends Controller
         $ordersSearchModel = new OrdersSearch();
         $allOrders = $ordersSearchModel->getFilteredOrders();
 
+        //-- Download  ---------------------------------------------------------
+        $get = yii::$app->request->get();
+        if(isset($get['download'])){
+            exit($ordersSearchModel->getCsv($allOrders));
+        }
+        //----------------------------------------------------------------------
+
+
         //-- передача параметров во вью в глобальную видимость
         Yii::$app->getView()->params['statusLabels'] = $orders::statusLabels();
         Yii::$app->getView()->params['modeLabels'] = $orders::modeLabels();
@@ -63,6 +72,8 @@ class OrdersController extends Controller
                 'pageSize' => 100
             ],
         ]);
+
+        
 
         return $this->render('index', [
             'dataProvider'      => $dataProvider,

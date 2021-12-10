@@ -13,6 +13,18 @@ class OrdersSearch extends Model
 {
     public $search_type;
     public $search_string;
+    public $mode;
+    public $status;
+
+
+
+    public static function searchTypeLabels(){
+        return [
+            'order_id' => Yii::t('om', 'Order ID'),
+            'link'      => Yii::t('om', 'Link'),
+            'username'  => Yii::t('om', 'Username')
+        ];
+    }
 
     /**
      * {@inheritdoc}
@@ -20,8 +32,9 @@ class OrdersSearch extends Model
     public function rules()
     {
         return [
-            [['search_type', 'search_string'], 'string'],
             [['search_type', 'search_string'], 'required'],
+            [['search_string'], 'string'],
+            [['search_type'], 'in', 'range' => array_keys(self::searchTypeLabels())],
         ];
     }
 
@@ -30,29 +43,28 @@ class OrdersSearch extends Model
      * @param $ordersSearchModel
      * @return Query
      */
-    public function getFilteredOrders(){
-        
-
+    public function getFilteredOrders()
+    {
         $request = Yii::$app->request;
+
 
         $allOrders = (new Query)
             ->select([
                 'o.*',
                 's.name',
-                'u.first_name',
-                'u.last_name'
+                'username' =>'CONCAT(u.first_name, " ", u.last_name)',
             ])
             //->from(['o' => 'orders']);
             ->from([new Expression('{{%orders}} o FORCE INDEX (PRIMARY)')]);
         $allOrders->leftJoin('users u', 'u.id = o.user_id');
         $allOrders->leftJoin('services s', 's.id = o.service_id');
 
-
         $filter = [
             'o.service_id' => $request->get('service_id'),
             'o.mode'       => $request->get('mode'),
             'o.status'     => $request->get('status')
         ];
+        $allOrders->andFilterWhere($filter);
 
         $this->load(Yii::$app->request->get());
         if($this->validate()) {
@@ -64,16 +76,52 @@ class OrdersSearch extends Model
                     $allOrders->andWhere(['like', 'o.link', $this->search_string]);
                     break;
                 case 'username':
-                    $allOrders->orWhere(['like', 'u.first_name', $this->search_string]);
-                    $allOrders->orWhere(['like', 'u.last_name', $this->search_string]);
-                    $allOrders->orWhere(['like', 'CONCAT(u.first_name, " ", u.last_name)', $this->search_string]);
+                    $allOrders->andFilterWhere([
+                        'OR',
+                        ['like', 'u.first_name', $this->search_string],
+                        ['like', 'u.last_name', $this->search_string],
+                        ['like', 'CONCAT(u.first_name, u.last_name)', $this->search_string]
+                    ]);
                     break;
             }
         }
-        $allOrders->andFilterWhere($filter);
+
+
+
         $allOrders->orderBy('o.id DESC');
 
         return $allOrders;
+    }
+
+    public function getCsv($ordersQuery){
+        $statusLabels   = Orders::statusLabels();
+        $modeLabels     = Orders::modeLabels();
+
+        header('Content-Type: application/csv');
+        header('Content-Disposition: attachment; filename="orders-'.date('Y.m.d H:i:s').'.csv"');
+
+        $fp = fopen('php://output', 'w');
+
+        //-- insert label to top
+        $row = (new Orders)->attributeLabels();
+        $row['user_id'] = Yii::t('om', 'User');
+        fputcsv($fp, $row, ';');
+
+        foreach ($ordersQuery->all() as $line) {
+            $row = [
+                $line['id'],
+                $line['username'],
+                $line['link'],
+                $line['quantity'],
+                $line['name'],
+                $statusLabels[$line['status']],
+                $modeLabels[$line['mode']],
+                date('Y.m.d H:i:s', $line['created_at'])
+            ];
+            fputcsv($fp, $row, ';');
+        }
+        fclose($fp);
+        return '';
     }
 
     /**
@@ -110,10 +158,30 @@ class OrdersSearch extends Model
 
         $ordersQuery->from(['o' => 'orders']);
         $ordersQuery->groupBy('o.service_id');
-        //--remove for correct widget
-        ArrayHelper::remove($ordersQuery->where, 'o.service_id');
-        $ordersQuery->orderBy('co');
+
+        //--remove service_id for correct widget
+        //highlight_string(print_r($ordersQuery->where        ,1));
+        self::arrayHelperRemoveByKey($ordersQuery->where, 'o.service_id');
+        //highlight_string(print_r($ordersQuery->where        ,1)); exit;
+
+        $ordersQuery->orderBy('co DESC');
 
         return $ordersQuery->all();
+    }
+
+    /**
+     * Recursive item killer
+     * @param $array
+     * @param $keySerch
+     */
+    public function arrayHelperRemoveByKey(&$array, $keySerch){
+        foreach($array as $key => &$value){
+            if(is_array($value)){
+                self::arrayHelperRemoveByKey($value, $keySerch);
+            }
+            if($key === $keySerch){
+                unset($array[$key]);
+            }
+        }
     }
 }

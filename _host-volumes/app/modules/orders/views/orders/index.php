@@ -76,11 +76,11 @@ use app\modules\orders\components\DropdownWidget;
         'columns' => [
             'id',
             [
-                'attribute' => 'first_name',
+                'attribute' => 'username',
                 'label' => Yii::t('om', 'User'),
-                'value' => function($model){
-                    return HTML::encode($model['first_name'].' '.$model['last_name']);
-                }
+//                'value' => function($model){
+//                    return HTML::encode($model['first_name'].' '.$model['last_name']);
+//                }
             ],
             ['attribute' => 'link', 'label' => Yii::t('om', 'Link')],
             [

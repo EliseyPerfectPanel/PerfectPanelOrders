@@ -21,19 +21,24 @@ use yii\helpers\ArrayHelper;
     ],
 
 ]); ?>
-
+    <?= Html::a(
+        'Download Results',
+        ArrayHelper::merge(
+            ['/orders/orders/index'],
+            yii::$app->request->get(),
+            ['download' => yii::$app->request->get('download', 1)]
+        ),
+         ['class' => 'btn btn-success']
+    ) ?>
     <div class="input-group">
+
         <?= $form->field($model, 'search_string', ['template' => "{input}"])
             ->textInput()
             ->input('text', ['placeholder' => Yii::t('om', 'Search orders'), 'class' => 'form-control'])
             ->label(false)
         ?>
         <span class="input-group-btn search-select-wrap">
-            <?= $form->field($model, 'search_type', ['template' => "{input}"])->dropDownList([
-                'order_id' => Yii::t('om', 'Order ID'),
-                'link'      => Yii::t('om', 'Link'),
-                'username'  => Yii::t('om', 'Username')
-            ],['class' => 'form-control search-select'])
+            <?= $form->field($model, 'search_type', ['template' => "{input}"])->dropDownList($model::searchTypeLabels(),['class' => 'form-control search-select'])
                 ->label(false)
             ?>
             <?= Html::button('<span class="glyphicon glyphicon-search" aria-hidden="true"></span>', [
