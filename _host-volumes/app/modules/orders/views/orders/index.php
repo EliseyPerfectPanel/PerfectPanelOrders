@@ -1,17 +1,16 @@
 <?php
 
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Menu;
 use app\modules\orders\components\DropdownWidget;
 
 /**
  * @var $servicesLabels array
- * @var $ordersSearchModel \app\modules\orders\models\OrdersSearch
+ * @var $ordersSearchModel \app\modules\orders\models\search\OrdersSearch
  */
 /* @var $this yii\web\View */
-/* @var $searchModel app\modules\orders\models\OrdersSearch */
+/* @var $searchModel app\modules\orders\models\search\OrdersSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 ?>
@@ -54,7 +53,6 @@ use app\modules\orders\components\DropdownWidget;
         $total+= $val['co'];
         $servicesLinks[$val['id']] = '<span class="label-id">'.$val['co'].'</span> '.$val['name'];
     }
-
 ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -78,9 +76,6 @@ use app\modules\orders\components\DropdownWidget;
             [
                 'attribute' => 'username',
                 'label' => Yii::t('om', 'User'),
-//                'value' => function($model){
-//                    return HTML::encode($model['first_name'].' '.$model['last_name']);
-//                }
             ],
             ['attribute' => 'link', 'label' => Yii::t('om', 'Link')],
             [
@@ -114,10 +109,11 @@ use app\modules\orders\components\DropdownWidget;
             [
                 'attribute' => 'mode',
                 'label' => DropdownWidget::widget([
-                    'items' => Yii::$app->getView()->params['modeLabels'],
                     'label' => Yii::t('om', 'Mode'),
+                    'items' => Yii::$app->getView()->params['modeLabels'],
                     'url' => ArrayHelper::merge(['/orders/orders/index'], yii::$app->request->get()),
-                    'addGetParam' => 'mode'
+                    'addGetParam' => 'mode',
+                    'allTitle' => Yii::t('om', 'All')
                 ]),
                 'enableSorting' => false,
                 'headerOptions' => ['class'=>'dropdown-th'],

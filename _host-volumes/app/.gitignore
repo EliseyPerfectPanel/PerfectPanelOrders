@@ -32,3 +32,22 @@ tests/_support/_generated
 #vagrant folder
 /.vagrant
 /web/assets/*
+/assets/
+/yii.bat
+/requirements.php
+/models/
+/widgets/
+/tests/
+/views/
+/LICENSE.md
+/controllers/
+/README.md
+/Vagrantfile
+/mail/
+/vagrant/
+/commands/
+/runtime/
+/yii
+/composer.lock
+/docker-compose.yml
+/codeception.yml

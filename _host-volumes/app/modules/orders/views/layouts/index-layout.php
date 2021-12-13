@@ -8,8 +8,6 @@ use app\widgets\Alert;
 use yii\widgets\Menu;
 use yii\bootstrap4\Html;
 
-
-//AppAsset::register($this);
 DefaultAsset::register($this);
 
 ?>
@@ -25,25 +23,6 @@ DefaultAsset::register($this);
 </head>
 <body>
     <?php $this->beginBody() ?>
-    <?php
-//        NavBar::begin([
-//            'options' => [
-//                'class' => 'navbar navbar-fixed-top navbar-default',
-//            ],
-//            'innerContainerOptions' => [
-//                    'class' => 'container-fluid'
-//            ]
-//        ]);
-
-//        echo Nav::widget([
-//            'options' => ['class' => 'nav navbar-nav'],
-//            'items' => [
-//                ['label' => 'Orders', 'url' => ['/orders/orders/index']],
-//            ],
-//        ]);
-
-//        NavBar::end();
-    ?>
     <nav class="navbar navbar-fixed-top navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -58,7 +37,7 @@ DefaultAsset::register($this);
                 <?= Menu::widget([
                     'options' => ['class' => 'nav navbar-nav'],
                     'items' => [
-                    ['label' => Yii::t('om', 'Orders'), 'url' => ['/orders/orders/index']],
+                        ['label' => Yii::t('om', 'Orders'), 'url' => ['/orders/orders/index']],
                     ],
                 ]);?>
             </div>

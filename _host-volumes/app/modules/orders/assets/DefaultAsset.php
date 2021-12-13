@@ -2,7 +2,6 @@
 /**
  * Добавляем свои стили и т.д. из модуля
  */
-
 namespace app\modules\orders\assets;
 
 use yii\web\AssetBundle;
@@ -15,13 +14,12 @@ class DefaultAsset extends AssetBundle
         'css/custom.css'
     ];
     public $js = [
-        'js/jquery.min.js',
+//        'js/jquery.min.js',
         'js/bootstrap.min.js'
     ];
 
     public $depends = [
         'yii\web\YiiAsset',
-//        'yii\bootstrap4\BootstrapAsset',
     ];
 
 

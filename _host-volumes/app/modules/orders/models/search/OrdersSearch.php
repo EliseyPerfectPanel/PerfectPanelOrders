@@ -1,20 +1,18 @@
 <?php
 
-namespace app\modules\orders\models;
+namespace app\modules\orders\models\search;
 
 
 use yii;
 use yii\base\Model;
 use yii\db\Expression;
 use yii\db\Query;
-use yii\helpers\ArrayHelper;
+use yii2tech\csvgrid\CsvGrid;
 
 class OrdersSearch extends Model
 {
     public $search_type;
     public $search_string;
-    public $mode;
-    public $status;
 
 
 
@@ -93,35 +91,32 @@ class OrdersSearch extends Model
         return $allOrders;
     }
 
-    public function getCsv($ordersQuery){
-        $statusLabels   = Orders::statusLabels();
-        $modeLabels     = Orders::modeLabels();
-
-        header('Content-Type: application/csv');
-        header('Content-Disposition: attachment; filename="orders-'.date('Y.m.d H:i:s').'.csv"');
-
-        $fp = fopen('php://output', 'w');
-
-        //-- insert label to top
-        $row = (new Orders)->attributeLabels();
-        $row['user_id'] = Yii::t('om', 'User');
-        fputcsv($fp, $row, ';');
-
-        foreach ($ordersQuery->all() as $line) {
-            $row = [
-                $line['id'],
-                $line['username'],
-                $line['link'],
-                $line['quantity'],
-                $line['name'],
-                $statusLabels[$line['status']],
-                $modeLabels[$line['mode']],
-                date('Y.m.d H:i:s', $line['created_at'])
-            ];
-            fputcsv($fp, $row, ';');
-        }
-        fclose($fp);
-        return '';
+    public function getCsv(){
+        $exporter = new CsvGrid([
+            'query' => $this->getFilteredOrders(),
+            'batchSize' => 10000, // export batch size,
+            'columns' => [
+                ['attribute' => 'id'],
+                ['attribute' => 'username', 'label' => Yii::t('om', 'User')],
+                ['attribute' => 'link', 'label' => Yii::t('om', 'Link')],
+                ['attribute' => 'quantity', 'label' => Yii::t('om', 'Quantity')],
+                ['attribute' => 'name', 'label' => Yii::t('om', 'Service Name')],
+                ['attribute' => 'status', 'label' => Yii::t('om', 'Status'),
+                    'value' => function($model){
+                        $labels = Yii::$app->getView()->params['statusLabels'];
+                        return isset($labels[$model['status']])?Yii::t('om', $labels[$model['status']]):'N/A';
+                    }
+                ],
+                ['attribute' => 'mode', 'label' => Yii::t('om', 'Mode'),
+                    'value' => function($model){
+                        $labels = Yii::$app->getView()->params['modeLabels'];
+                        return isset($labels[$model['mode']])?Yii::t('om', $labels[$model['mode']]):'N/A';
+                    }
+                ],
+                ['attribute' => 'created_at', 'label' => Yii::t('om', 'Created At'), 'format' => ['date', 'php:Y.m.d H:i:s']]
+            ],
+        ]);
+        $exporter->export()->send('Orders-'.date('Y.m.d-H:i:s').'.csv');
     }
 
     /**
@@ -130,26 +125,6 @@ class OrdersSearch extends Model
      */
     public function getAllServisesGroupped($ordersQuery)
     {
-/*        $ordersQuery->select([
-            'COUNT(*)',
-        ]);
-        $ordersQuery->from(['o' => 'orders']);
-        $ordersQuery->andWhere('o.service_id = sw.id');
-
-//        var_dump($ordersQuery->createCommand()->rawSql);exit;
-        
-
-        $query = (new \yii\db\Query)
-            ->select([
-                'name'  => 'sw.name',
-                'id'    => 'sw.id',
-                'co'    => $ordersQuery,
-            ])
-            ->from(['sw' => 'services'])
-            ->having('co > 0')
-            ->orderBy('co DESC');*/
-
-
         $ordersQuery->select([
             'co' => 'COUNT(o.service_id)',
             'name'  => 's.name',
@@ -160,9 +135,7 @@ class OrdersSearch extends Model
         $ordersQuery->groupBy('o.service_id');
 
         //--remove service_id for correct widget
-        //highlight_string(print_r($ordersQuery->where        ,1));
         self::arrayHelperRemoveByKey($ordersQuery->where, 'o.service_id');
-        //highlight_string(print_r($ordersQuery->where        ,1)); exit;
 
         $ordersQuery->orderBy('co DESC');
 
@@ -175,12 +148,14 @@ class OrdersSearch extends Model
      * @param $keySerch
      */
     public function arrayHelperRemoveByKey(&$array, $keySerch){
-        foreach($array as $key => &$value){
-            if(is_array($value)){
-                self::arrayHelperRemoveByKey($value, $keySerch);
-            }
-            if($key === $keySerch){
-                unset($array[$key]);
+        if(!empty($array)) {
+            foreach ($array as $key => &$value) {
+                if (is_array($value)) {
+                    self::arrayHelperRemoveByKey($value, $keySerch);
+                }
+                if ($key === $keySerch) {
+                    unset($array[$key]);
+                }
             }
         }
     }

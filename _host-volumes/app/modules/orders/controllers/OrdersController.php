@@ -4,12 +4,11 @@ namespace app\modules\orders\controllers;
 
 use yii;
 use app\modules\orders\models\Orders;
-use app\modules\orders\models\OrdersSearch;
+use app\modules\orders\models\search\OrdersSearch;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Controller;
 use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
 
 
 /**
@@ -31,7 +30,7 @@ class OrdersController extends Controller
             parent::behaviors(),
             [
                 'verbs' => [
-                    'class' => VerbFilter::className(),
+                    'class' => VerbFilter::class,
                     'actions' => [
                         'delete' => ['POST'],
                     ],
@@ -47,23 +46,21 @@ class OrdersController extends Controller
     public function actionIndex()
     {
 
-        $orders = new Orders();
-
         $ordersSearchModel = new OrdersSearch();
-        $allOrders = $ordersSearchModel->getFilteredOrders();
-
-        //-- Download  ---------------------------------------------------------
-        $get = yii::$app->request->get();
-        if(isset($get['download'])){
-            exit($ordersSearchModel->getCsv($allOrders));
-        }
-        //----------------------------------------------------------------------
-
-
+        $orders = new Orders();
         //-- передача параметров во вью в глобальную видимость
         Yii::$app->getView()->params['statusLabels'] = $orders::statusLabels();
         Yii::$app->getView()->params['modeLabels'] = $orders::modeLabels();
 
+        $allOrders = $ordersSearchModel->getFilteredOrders();
+        //-- Download  -------------------------------------
+        if(yii::$app->request->get('download')){
+            $ordersSearchModel->getCsv();
+        }
+
+
+
+        //-- data for widget with services
         $servicesLabels = $ordersSearchModel->getAllServisesGroupped(clone $allOrders);
 
         $dataProvider = new ActiveDataProvider([
@@ -72,8 +69,6 @@ class OrdersController extends Controller
                 'pageSize' => 100
             ],
         ]);
-
-        
 
         return $this->render('index', [
             'dataProvider'      => $dataProvider,
