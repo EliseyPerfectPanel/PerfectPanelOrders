@@ -16,7 +16,7 @@ return [
     'silentExitOnException' => null,
     'sourcePath' => '@app/modules/orders/',
     'messagePath' => '@app/modules/orders/messages',
-    'languages' => ['ru-RU'],
+    'languages' => ['ru', 'en'],
     'translator' => 'Yii::t',
     'sort' => false,
     'overwrite' => true,

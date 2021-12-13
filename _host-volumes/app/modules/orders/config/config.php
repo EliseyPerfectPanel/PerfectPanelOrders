@@ -2,6 +2,6 @@
 
 return [
     'params' => [
-        'language' => 'ru-RU',
+        'language' => 'en', //-- ru added
     ],
 ];

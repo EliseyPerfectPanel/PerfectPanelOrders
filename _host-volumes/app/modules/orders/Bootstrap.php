@@ -14,6 +14,9 @@ class Bootstrap implements BootstrapInterface
      */
     public function bootstrap($app)
     {
+        Yii::$app->urlManager->enablePrettyUrl = true;
+        Yii::$app->urlManager->showScriptName = false;
+
         Yii::setAlias('@moduleOrders', __DIR__);
         $app->getUrlManager()->addRules(
             [

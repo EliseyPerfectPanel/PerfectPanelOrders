@@ -11,11 +11,19 @@ use yii2tech\csvgrid\CsvGrid;
 
 class OrdersSearch extends Model
 {
+    /**
+     * @var string Types of search. Used in search form
+     */
     public $search_type;
+    /**
+     * @var  string Search string. Used in search form
+     */
     public $search_string;
 
 
-
+    /**
+     * @return array Possible keys for search types
+     */
     public static function searchTypeLabels(){
         return [
             'order_id' => Yii::t('om', 'Order ID'),
@@ -37,8 +45,7 @@ class OrdersSearch extends Model
     }
 
     /**
-     * Return query with filtered result
-     * @param $ordersSearchModel
+     * Return query with filtered result. Used Yii::$app->request for filtering
      * @return Query
      */
     public function getFilteredOrders()
@@ -84,13 +91,14 @@ class OrdersSearch extends Model
             }
         }
 
-
-
         $allOrders->orderBy('o.id DESC');
-
         return $allOrders;
     }
 
+    /**
+     * Filtered results export to CSV file and starts download in browser
+     * @throws yii\base\InvalidConfigException
+     */
     public function getCsv(){
         $exporter = new CsvGrid([
             'query' => $this->getFilteredOrders(),
@@ -120,8 +128,8 @@ class OrdersSearch extends Model
     }
 
     /**
+     * Get all uniq services based on filtering query
      * @return array
-     * Get all uniq services
      */
     public function getAllServisesGroupped($ordersQuery)
     {

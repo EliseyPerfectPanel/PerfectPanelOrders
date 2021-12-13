@@ -5,7 +5,7 @@ use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
-/* @var $model app\modules\orders\models\OrdersSearch */
+/* @var $model app\modules\orders\models\search\OrdersSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 <?php $form = ActiveForm::begin([
@@ -22,7 +22,7 @@ use yii\helpers\ArrayHelper;
 
 ]); ?>
     <?= Html::a(
-        'Download Results',
+        Yii::t('om', 'Download Results'),
         ArrayHelper::merge(
             ['/orders/orders/index'],
             yii::$app->request->get(),

@@ -6,13 +6,11 @@ use yii;
 use app\modules\orders\models\Orders;
 use app\modules\orders\models\search\OrdersSearch;
 use yii\data\ActiveDataProvider;
-use yii\web\NotFoundHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 
-
 /**
- * OrdersController implements the CRUD actions for Orders model.
+ * Main controler for Test task
  */
 class OrdersController extends Controller
 {
@@ -20,23 +18,6 @@ class OrdersController extends Controller
         parent::init();
         $this->layout = "index-layout";
         $this->viewPath = '@moduleOrders/views/orders';
-    }
-    /**
-     * @inheritDoc
-     */
-    public function behaviors()
-    {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::class,
-                    'actions' => [
-                        'delete' => ['POST'],
-                    ],
-                ],
-            ]
-        );
     }
 
     /**
@@ -58,9 +39,7 @@ class OrdersController extends Controller
             $ordersSearchModel->getCsv();
         }
 
-
-
-        //-- data for widget with services
+        //-- Data for widget with services
         $servicesLabels = $ordersSearchModel->getAllServisesGroupped(clone $allOrders);
 
         $dataProvider = new ActiveDataProvider([
@@ -75,21 +54,5 @@ class OrdersController extends Controller
             'servicesLabels'    => $servicesLabels,
             'ordersSearchModel' => $ordersSearchModel
         ]);
-    }
-
-    /**
-     * Finds the Orders model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return Orders the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Orders::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException(Yii::t('om', 'The requested page does not exist.'));
     }
 }

@@ -3,6 +3,7 @@
 namespace app\modules\orders\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "orders".
@@ -16,7 +17,7 @@ use Yii;
  * @property int $created_at
  * @property int $mode 0 - Manual, 1 - Auto
  */
-class Orders extends \yii\db\ActiveRecord
+class Orders extends ActiveRecord
 {
     /**
      * Possible status keys

@@ -25,6 +25,7 @@ class Orders extends Module
             'class'          => 'yii\i18n\PhpMessageSource',
             'basePath'       => '@moduleOrders/messages',
         ];
+        
         //-- Language from config of module
         Yii::configure($this, require __DIR__ . '/config/config.php');
         yii::$app->language = $this->params['language'];
@@ -36,7 +37,6 @@ class Orders extends Module
                 'js' => ['//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js']
              ]
         ];
-
 
     }
 }
