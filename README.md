@@ -1,16 +1,32 @@
-
 # Test Project
 
-I hope you have a docker
-
 ```bash
-1. Git clone https://github.com/EliseyPerfectPanel/PerfectPanelOrders
-2. Docker-compose up -d  --build
-3. Cp .env-dist .env
-4. Open CLI image name local/yiisoftware/yii2-php:7.4-apache
-5. Install composer curl -sS https://getcomposer.org/installer | php mv composer.phar /usr/local/bin/composer
-6. Composer update
-7. Php yii migrate
+1. git clone https://github.com/EliseyPerfectPanel/PerfectPanelOrders
+```
+Конфиг для окружения:
+```bash
+2. cp .env-example .env
+```
+```bash
+3. cd docker
+```
+```bash
+4. docker-compose up -d  --build
+```
+Конфиг для докера
+```bash
+5. cp .env-dist .env
+```
+```bash
+6. Open CLI image name local/yiisoftware/yii2-php:7.4-apache
+```
+Установка Yii и пары дополнительных пакетов
+```bash
+7. composer install
+```
+Запуск миграции.
+```bash
+8. php yii migrate
 ```
 
 ## Links

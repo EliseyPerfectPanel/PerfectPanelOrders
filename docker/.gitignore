@@ -1,0 +1,6 @@
+.env
+*.swp
+
+\.idea/
+.data
+/_host-volumes/yii2/

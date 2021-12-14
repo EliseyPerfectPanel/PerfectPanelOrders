@@ -1,6 +1,38 @@
-.env
-*.swp
+# phpstorm project files
+.idea
 
-\.idea/
-.data
-/_host-volumes/yii2/
+# netbeans project files
+nbproject
+
+# zend studio for eclipse project files
+.buildpath
+.project
+.settings
+
+# windows thumbnail cache
+Thumbs.db
+
+# composer vendor dir
+/vendor
+
+# composer itself is not needed
+composer.phar
+
+# Mac DS_Store Files
+.DS_Store
+
+# phpunit itself is not needed
+phpunit.phar
+# local phpunit config
+
+
+#vagrant folder
+/.vagrant
+/web/assets/*
+/requirements.php
+/tests/
+/views/
+/LICENSE.md
+/commands/
+/runtime/
+/.env
