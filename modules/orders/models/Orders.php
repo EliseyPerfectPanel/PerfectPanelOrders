@@ -23,14 +23,14 @@ class Orders extends ActiveRecord
      * Possible status keys
      * @return array
      */
-    public static function statusLabels()
+    public static function statusLabels() :array
     {
         return [
-            0 => Yii::t('om', 'Pending'),
-            1 => Yii::t('om', 'In progress'),
-            2 => Yii::t('om', 'Completed'),
-            3 => Yii::t('om', 'Canceled'),
-            4 => Yii::t('om', 'Fail')
+            0 => Yii::t('orders', 'models.orders.status.label.pending'),
+            1 => Yii::t('orders', 'models.orders.status.label.in_progress'),
+            2 => Yii::t('orders', 'models.orders.status.label.completed'),
+            3 => Yii::t('orders', 'models.orders.status.label.canceled'),
+            4 => Yii::t('orders', 'models.orders.status.label.fail')
         ];
     }
 
@@ -38,18 +38,18 @@ class Orders extends ActiveRecord
      * Possible mode keys
      * @return array
      */
-    public static function modeLabels()
+    public static function modeLabels() :array
     {
         return [
-            0 => Yii::t('om', 'Manual'),
-            1 => Yii::t('om', 'Auto'),
+            0 => Yii::t('orders', 'models.orders.label.dropdown.manual'),
+            1 => Yii::t('orders', 'models.orders.label.dropdown.auto'),
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName() :string
     {
         return 'orders';
     }
@@ -57,7 +57,7 @@ class Orders extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules() :array
     {
         return [
             [['user_id', 'link', 'quantity', 'service_id', 'status', 'created_at', 'mode'], 'required'],
@@ -69,17 +69,17 @@ class Orders extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels() :array
     {
         return [
-            'id' => Yii::t('om', 'ID'),
-            'user_id' => Yii::t('om', 'User ID'),
-            'link' => Yii::t('om', 'Link'),
-            'quantity' => Yii::t('om', 'Quantity'),
-            'service_id' => Yii::t('om', 'Service ID'),
-            'status' => Yii::t('om', 'Status'),
-            'mode' => Yii::t('om', 'Mode'),
-            'created_at' => Yii::t('om', 'Created At'),
+            'id' => Yii::t('orders', 'models.orders.label.id'),
+            'user_id' => Yii::t('orders', 'models.orders.label.user_id'),
+            'link' => Yii::t('orders', 'models.orders.label.link'),
+            'quantity' => Yii::t('orders', 'models.orders.label.quantity'),
+            'service_id' => Yii::t('orders', 'models.orders.label.service_id'),
+            'status' => Yii::t('orders', 'models.orders.label.status'),
+            'mode' => Yii::t('orders', 'models.orders.label.mode'),
+            'created_at' => Yii::t('orders', 'models.orders.label.created_at'),
         ];
     }
 }

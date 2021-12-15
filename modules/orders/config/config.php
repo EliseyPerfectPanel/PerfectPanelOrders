@@ -2,6 +2,7 @@
 
 return [
     'params' => [
-        'language' => 'en', //-- ru added
+        'language' => 'ru', //-- Available ru and en
+        'datetimeFormat' => 'php:Y-m-d H:i:s'
     ],
 ];

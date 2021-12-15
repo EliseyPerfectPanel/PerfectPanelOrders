@@ -1,132 +1,81 @@
 <?php
 
-use yii\helpers\ArrayHelper;
 use yii\grid\GridView;
 use yii\widgets\Menu;
-use orders\widgets\DropdownWidget;
+use orders\models\Orders;
 
 /**
- * @var $servicesLabels array
- * @var $ordersSearchModel orders\models\search\OrdersSearch
+ * @var array $statusMenuItems Items for submenu
+ * @var array $orders DataProvider with filtered orders
+ * @var string $servicesWidget HTML of services column widget
+ * @var string $modeWidget HTML of mode column widget
  */
-/* @var $this yii\web\View */
-/* @var $searchModel orders\models\search\OrdersSearch */
-/* @var $dataProvider yii\data\ActiveDataProvider */
 
 ?>
-<?php
-
-    //-- StatusWidget
-    $links = [];
-    $links[] = [
-        'label' => Yii::t('om', 'All orders'),
-        'url'   => ['/orders/orders/index'],
-        //-- remove active trail from first link
-        'active' => function ($item, $hasActiveChild, $isItemActive, $widget){
-            return yii::$app->request->get('status')!==NULL?false:true;
-        }
-    ];
-    foreach (Yii::$app->getView()->params['statusLabels'] as $key => $val){
-        $links[] = [
-            'label'     => $val,
-            'url'       => ['/orders/orders/index', 'status' => $key],
-            'template'  => '<a href="{url}" class="ico ico-about">{label}</a>'
-        ];
-    }
-    //-- add Search Form in <li>
-    $links[] = [
-        'template'  => $this->render('_search', ['model' => $ordersSearchModel]),
-        'options'   => [
-            'class' => 'pull-right custom-search'
-        ]
-    ];
-
-    echo Menu::widget([
-        'options'   => ['class' => 'nav nav-tabs p-b'],
-        'items'     => $links,
-    ]);
-
-    //-- ServicesWidget. Not translated
-    $servicesLinks = [];
-    $total = 0;
-    foreach ($servicesLabels as $key => $val){
-        $total+= $val['co'];
-        $servicesLinks[$val['id']] = '<span class="label-id">'.$val['co'].'</span> '.$val['name'];
-    }
-?>
+    <?= Menu::widget([
+            'options'   => ['class' => 'nav nav-tabs p-b'],
+            'items'     => $statusMenuItems,
+        ]);
+    ?>
     <?= GridView::widget([
-        'dataProvider' => $dataProvider,
+        'dataProvider' => $orders,
         'tableOptions'  => ['class' => 'table order-table'],
         'showFooter' => true,
         'layout' => '
-              {items}
-              <div class="row">
+            {items}
+            <div class="row">
                 <div class="col-sm-8">
                     <nav>{pager}</nav>
                 </div>
                 <div class="col-sm-4 pagination-counters">
-                  {summary}
+                {summary}
                 </div>
-              </div>
+            </div>
         ',
-        'summary' => Yii::t('om', "{begin} to {end} of {totalCount}"),
-
+        'summary' => Yii::t('orders', "{begin} to {end} of {totalCount}"),
         'columns' => [
             'id',
             [
                 'attribute' => 'username',
-                'label' => Yii::t('om', 'User'),
+                'label' => Yii::t('orders', 'views.orders.index.label.user'),
             ],
-            ['attribute' => 'link', 'label' => Yii::t('om', 'Link')],
+            ['attribute' => 'link', 'label' => Yii::t('orders', 'views.orders.index.label.link')],
             [
                 'attribute' => 'quantity',
-                'label' => Yii::t('om', 'Quantity')
+                'label' => Yii::t('orders', 'views.orders.index.label.quantity')
             ],
             [
                 'attribute' => 'services.name',
                 'format' => 'raw',
-                'label' => DropdownWidget::widget([
-                    'label' => Yii::t('om', 'Service'),
-                    'items' => $servicesLinks,
-                    'url' => ArrayHelper::merge(['/orders/orders/index'], yii::$app->request->get()),
-                    'addGetParam' => 'service_id',
-                    'allTitle' => Yii::t('om', 'All').' ('.$total.')'
-                ]),
+                'label' => $servicesWidget,
                 'headerOptions' => ['class'=>'dropdown-th'],
                 'encodeLabel' => false,
                 'value' => function($model){
-                    return '<span class="label-id">id:'.$model['service_id'].'</span>'.Yii::t('om', $model['name']);
+                    return '<span class="label-id">id:'.$model['service_id'].'</span>'.$model['name'];
                 }
             ],
             [
                 'attribute' => 'status',
-                'label' => Yii::t('om', 'Status'),
-                'value' => function($model){
-                    $labels = Yii::$app->getView()->params['statusLabels'];
-                    return isset($labels[$model['status']])?Yii::t('om', $labels[$model['status']]):'N/A';
+                'label' => Yii::t('orders', 'views.orders.index.label.status'),
+                'value' => function($model) use ($statusMenuItems){
+                    return isset($statusMenuItems[$model['status']]) ? $statusMenuItems[$model['status']]['label'] : 'N/A';
                 }
             ],
             [
                 'attribute' => 'mode',
-                'label' => DropdownWidget::widget([
-                    'label' => Yii::t('om', 'Mode'),
-                    'items' => Yii::$app->getView()->params['modeLabels'],
-                    'url' => ArrayHelper::merge(['/orders/orders/index'], yii::$app->request->get()),
-                    'addGetParam' => 'mode',
-                    'allTitle' => Yii::t('om', 'All')
-                ]),
+                'label' => $modeWidget,
                 'enableSorting' => false,
                 'headerOptions' => ['class'=>'dropdown-th'],
                 'encodeLabel' => false,
                 'value' => function($model){
-                    $labels = Yii::$app->getView()->params['modeLabels'];
-                    return isset($labels[$model['mode']])?Yii::t('om', $labels[$model['mode']]):'N/A';
+                    $labels = Orders::modeLabels();
+                    return $labels[$model['mode']] ?? 'N/A';
                 }
             ],
             [
                 'attribute' => 'created_at',
-                'label' => Yii::t('om', 'Created At'),
-                'format' => ['date', 'php:Y.m.d H:i:s']
+                'label' => Yii::t('orders', 'models.orders.label.created_at'),
+                'format' => 'datetime'
             ]
 
 

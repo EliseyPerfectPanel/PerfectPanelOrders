@@ -17,7 +17,7 @@ class Users extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName() :string
     {
         return 'users';
     }
@@ -25,7 +25,7 @@ class Users extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules() :array
     {
         return [
             [['first_name', 'last_name'], 'required'],
@@ -36,12 +36,12 @@ class Users extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels() :array
     {
         return [
-            'id' => Yii::t('om', 'ID'),
-            'first_name' => Yii::t('om', 'First Name'),
-            'last_name' => Yii::t('om', 'Last Name'),
+            'id' => Yii::t('orders', 'models.users.label.id'),
+            'first_name' => Yii::t('orders', 'models.users.label.firstname'),
+            'last_name' => Yii::t('orders', 'models.users.label.lastname'),
         ];
     }
 }

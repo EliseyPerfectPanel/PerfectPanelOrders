@@ -16,7 +16,7 @@ class Services extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName() :string
     {
         return 'services';
     }
@@ -24,7 +24,7 @@ class Services extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules() :array
     {
         return [
             [['name'], 'required'],
@@ -35,11 +35,11 @@ class Services extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels() :array
     {
         return [
-            'id' => Yii::t('om', 'ID'),
-            'name' => Yii::t('om', 'Name'),
+            'id' => Yii::t('orders', 'models.services.label.id'),
+            'name' => Yii::t('orders', 'models.services.label.name'),
         ];
     }
 }

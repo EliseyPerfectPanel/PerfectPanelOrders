@@ -7,14 +7,9 @@ namespace orders\widgets;
 
 use yii;
 use yii\base\Widget;
-use yii\helpers\Html;
-use yii\widgets\Menu;
 use yii\helpers\ArrayHelper;
 use yii\base\Exception;
 
-/**
- *
- */
 class DropdownWidget extends Widget
 {
 
@@ -50,64 +45,55 @@ class DropdownWidget extends Widget
     public function init()
     {
         parent::init();
+
         if(empty($this->label)){
-            $this->label = 'Dropdown';
+            $this->label = 'widgets.dropdown.label';
         }
         if(!isset($this->allTitle)){
-            $this->allTitle = 'All';
+            $this->allTitle = 'widgets.dropdown.label.all';
         }
         if(empty($this->addGetParam)){
-            throw new Exception('Udefined param addGetParam');
+            throw new Exception('Undefined param addGetParam');
         }
     }
 
 
+    /**
+     * @throws \Exception
+     */
     public function run(): string
     {
         static $id = 1;
         $id++;
 
-        $html = '';
-
-        if(!empty($this->items)){
-            $html.='
-                <div class="dropdown">
-                  <button class="btn btn-th btn-default dropdown-toggle" type="button" id="dropdownMenu'.$id.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    '.Html::encode(Yii::t('om', $this->label)).'
-                    <span class="caret"></span>
-                  </button>';
-
-
-            if(is_array($this->items)) {
-                $linkForFirstItem = $this->url;
-                if(isset($this->url[$this->addGetParam])){
-                    unset($linkForFirstItem[$this->addGetParam]);
-                }
-                $links = [];
-                $links[] = [
-                    'label' => Yii::t('om', $this->allTitle),
-                    'url' => $linkForFirstItem,
-                    //-- remove active trail from first link
-                    'active' => !empty($this->addGetParam) ? function () {
-                        return yii::$app->request->get($this->addGetParam) !== NULL ? false : true;
-                    } : null
-                ];
-
-                foreach ($this->items as $key => $val) {
-                    $links[] = [
-                        'label' => $val,
-                        'url' => ArrayHelper::merge($this->url, !empty($this->addGetParam) ? [$this->addGetParam => $key] : null)];
-                }
-
-                $html .= Menu::widget([
-                    'options' => ['class' => 'dropdown-menu', 'aria-labelledby' => 'dropdownMenu' . $id],
-                    'items' => $links,
-                    'encodeLabels' => false
-                ]);
+        if(!empty($this->items) && is_array($this->items)) {
+            $linkForFirstItem = $this->url;
+            if(isset($this->url[$this->addGetParam])){
+                unset($linkForFirstItem[$this->addGetParam]);
             }
-           $html.='</div>';
-            
+            $links = [];
+            $links[] = [
+                'label' => Yii::t('orders', $this->allTitle),
+                'url' => $linkForFirstItem,
+                //-- remove active trail from first link
+                'active' => !empty($this->addGetParam) ? function () {
+                    return !(yii::$app->request->get($this->addGetParam) !== null);
+                } : null
+            ];
+
+            foreach ($this->items as $key => $val) {
+                $links[] = [
+                'label' => $val,
+                'url' => ArrayHelper::merge($this->url, !empty($this->addGetParam) ? [$this->addGetParam => $key] : null)];
+            }
+
+            return $this->render('dropdownWidget', [
+                'id' => $id,
+                'label' => $this->label,
+                'items' => $links
+            ]);
+        } else {
+            return '';
         }
-        return $html;
     }
 }

@@ -23,17 +23,17 @@ class Orders extends Module
     {
         parent::init();
 
-        Yii::$app->i18n->translations['om*'] = [
+        yii::$app->i18n->translations['orders*'] = [
             'class'          => 'yii\i18n\PhpMessageSource',
             'basePath'       => '@orders/messages',
         ];
         
-        //-- Language from config of module
-        Yii::configure($this, require __DIR__ . '/config/config.php');
+        yii::configure($this, require __DIR__ . '/config/config.php');
         yii::$app->language = $this->params['language'];
+        yii::$app->formatter->datetimeFormat = $this->params['datetimeFormat'];
 
         //-- Set another version of jQuery for bootstrap.js from test
-        Yii::$app->assetManager->bundles = [
+        yii::$app->assetManager->bundles = [
             'yii\web\JqueryAsset' => [
                 'sourcePath' => null,
                 'js' => ['//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js']

@@ -5,13 +5,15 @@ use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
-/* @var $model orders\models\search\OrdersSearch */
+/* @var $model orders\models\search\SearchForm */
 /* @var $form yii\widgets\ActiveForm */
+
 ?>
 <?php $form = ActiveForm::begin([
     'action' => ArrayHelper::merge(
             ['/orders/orders/index'],
-            ['status' => yii::$app->request->get('status', null)]),
+            ['status' => yii::$app->request->get('status', null)]
+    ),
     'method' => 'get',
     'options' => [
         'class' => 'form-inline'
@@ -24,18 +26,18 @@ use yii\helpers\ArrayHelper;
 
 ]); ?>
     <?= Html::a(
-        Yii::t('om', 'Download Results'),
-        ArrayHelper::merge(
-            ['/orders/orders/csv'],
-            yii::$app->request->get()
-        ),
-        ['class' => 'btn btn-success']
+            Yii::t('orders', 'views.orders._search.download'),
+            ArrayHelper::merge(
+                ['/orders/orders/csv'],
+                yii::$app->request->get()
+            ),
+            ['class' => 'btn btn-success']
     ) ?>
     <div class="input-group">
 
         <?= $form->field($model, 'search_string', ['template' => "{input}"])
             ->textInput()
-            ->input('text', ['placeholder' => Yii::t('om', 'Search orders'), 'class' => 'form-control'])
+            ->input('text', ['placeholder' => Yii::t('orders', 'views.orders._search.search'), 'class' => 'form-control'])
             ->label(false)
         ?>
         <span class="input-group-btn search-select-wrap">

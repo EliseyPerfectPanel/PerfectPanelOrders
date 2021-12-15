@@ -3,13 +3,11 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-use app\modules\orders\assets\DefaultAsset;
-use app\widgets\Alert;
+use orders\assets\DefaultAsset;
 use yii\widgets\Menu;
 use yii\bootstrap4\Html;
 
 DefaultAsset::register($this);
-
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -37,14 +35,13 @@ DefaultAsset::register($this);
                 <?= Menu::widget([
                     'options' => ['class' => 'nav navbar-nav'],
                     'items' => [
-                        ['label' => Yii::t('om', 'Orders'), 'url' => ['/orders/orders/index']],
+                        ['label' => Yii::t('orders', 'mainmenu.orders'), 'url' => ['/orders/orders/index']],
                     ],
                 ]);?>
             </div>
         </div>
     </nav>
     <div class="container-fluid">
-        <?= Alert::widget() ?>
         <?= $content ?>
     </div>
     <?php $this->endBody() ?>
