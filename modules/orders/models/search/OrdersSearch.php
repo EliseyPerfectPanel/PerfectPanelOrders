@@ -4,6 +4,8 @@ namespace orders\models\search;
 
 use Exception;
 use orders\models\Orders;
+use orders\models\Services;
+use orders\models\Users;
 use orders\widgets\DropdownWidget;
 use yii;
 use yii\base\Model;
@@ -19,6 +21,61 @@ class OrdersSearch extends Model
      * @var array Params. Example yii::$app->request->get()
      */
     private $params = [];
+
+    /**
+     * @var int
+     */
+    public $service_id;
+    /**
+     * @var int
+     */
+    public $mode;
+    /**
+     * @var int
+     */
+    public $status;
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules(): array
+    {
+        return [
+            [['mode'], 'in', 'range' => array_keys(Orders::modeLabels())],
+            [['status'], 'in', 'range' => array_keys(Orders::statusLabels())],
+            [['status', 'mode', 'service_id'], 'integer'],
+        ];
+    }
+
+    /**
+     * Return available params for generating url in widgets or anywere
+     * @return array
+     */
+    public static function availableGetParams(): array
+    {
+        $searchFormVars = get_class_vars('orders\models\search\SearchForm');
+        return ArrayHelper::merge(
+            array_keys($searchFormVars),
+            [
+                'service_id',
+                'mode',
+                'status'
+            ]
+        );
+    }
+
+    /**
+     * Link for widgets that remove all not available params in $_GET
+     * @return array
+     */
+    public function getWidgetUrl(): array
+    {
+        return ArrayHelper::merge(
+            ['/orders/orders/index'],
+            array_intersect_key($this->params, array_flip(self::availableGetParams()))
+        );
+    }
 
     /**
      * Set default params
@@ -38,27 +95,30 @@ class OrdersSearch extends Model
      */
     public function getFilteredOrders(): Query
     {
+        if (!$this->load($this->params, '') || !$this->validate()) {
+            return (new Query());
+        }
+
         $allOrders = (new Query())
             ->select([
                 'o.*',
                 's.name',
-                'username' =>'CONCAT(u.first_name, " ", u.last_name)',
+                'username' => 'CONCAT(u.first_name, " ", u.last_name)',
             ])
-            ->from([new Expression('{{%orders}} o FORCE INDEX (PRIMARY)')]);
-        $allOrders->leftJoin('users u', 'u.id = o.user_id');
-        $allOrders->leftJoin('services s', 's.id = o.service_id');
+            ->from([new Expression(Orders::tableName() . ' o FORCE INDEX (PRIMARY)')]);
+        $allOrders->leftJoin(Users::tableName() . ' u', 'u.id = o.user_id');
+        $allOrders->leftJoin(Services::tableName() . ' s', 's.id = o.service_id');
 
         $filter = [
-            'o.service_id' => ArrayHelper::getValue($this->params, 'service_id'),
-            'o.mode' => ArrayHelper::getValue($this->params, 'mode'),
-            'o.status' => ArrayHelper::getValue($this->params, 'status')
+            'o.service_id' => $this->service_id,
+            'o.mode' => $this->mode,
+            'o.status' => $this->status
         ];
-
         $allOrders->andFilterWhere($filter);
 
         $searchForm = new SearchForm();
         $searchForm->load($this->params);
-        if($searchForm->validate()) {
+        if ($searchForm->validate()) {
             switch ($searchForm->search_type) {
                 case 'order_id':
                     $allOrders->andWhere(['o.id' => $searchForm->search_string]);
@@ -75,6 +135,9 @@ class OrdersSearch extends Model
                     ]);
                     break;
             }
+        } else {
+            $searchForm->search_type = '';
+            $searchForm->search_string = '';
         }
 
         $allOrders->orderBy('o.id DESC');
@@ -87,38 +150,42 @@ class OrdersSearch extends Model
      * @return ActiveDataProvider
      * @throws Exception
      */
-    public function orders() :ActiveDataProvider
+    public function orders(): ActiveDataProvider
     {
-        return new ActiveDataProvider([
-            'query' => $this->getFilteredOrders(),
-            'pagination' => [
-                'pageSize' => ArrayHelper::getValue($this->params, 'pageSize', 100)
-            ],
-        ]);
+        $orders = $this->getFilteredOrders();
+        if (!empty($orders->select)) {
+            return new ActiveDataProvider([
+                'query' => $orders,
+                'pagination' => [
+                    'pageSize' => ArrayHelper::getValue($this->params, 'pageSize', 100)
+                ],
+            ]);
+        } else {
+            return (new ActiveDataProvider());
+        }
     }
 
     /**
      * Generate items for Menu::widget. Add one item with searchForm
      * @return array
      */
-    public function prepareStatusItems():array
+    public function prepareStatusItems(): array
     {
-
         $links = [];
         $links['all'] = [
             'label' => Yii::t('orders', 'models.search.orderssearch.label.all'),
-            'url'   => ['/orders/orders/index'],
+            'url' => ['/orders/orders/index'],
             //-- remove active trail from first link
             'active' => function () {
                 return !(ArrayHelper::getValue($this->params, 'status') !== null);
             }
         ];
 
-        foreach (Orders::statusLabels() as $key => $val){
+        foreach (Orders::statusLabels() as $key => $val) {
             $links[$key] = [
-                'label'     => $val,
-                'url'       => ['/orders/orders/index', 'status' => $key],
-                'template'  => '<a href="{url}" class="ico ico-about">{label}</a>'
+                'label' => $val,
+                'url' => ['/orders/orders/index', 'status' => $key],
+                'template' => '<a href="{url}" class="ico ico-about">{label}</a>'
             ];
         }
 
@@ -126,8 +193,14 @@ class OrdersSearch extends Model
         $form = new SearchForm();
         $form->load($this->params);
         $links['form'] = [
-            'template'  => yii::$app->view->render('@orders/views/orders/_search', ['model' => $form]),
-            'options'   => [
+            'template' => yii::$app->view->render(
+                '@orders/views/orders/_search',
+                [
+                    'model' => $form,
+                    'url' => $this->getWidgetUrl()
+                ]
+            ),
+            'options' => [
                 'class' => 'pull-right custom-search'
             ]
         ];
@@ -136,28 +209,30 @@ class OrdersSearch extends Model
     }
 
     /**
-     * Return Services widget HTML
+     * Return Services' widget HTML
      * @return string
      * @throws Exception
      */
-    public function prepareServicesWidget() :string
+    public function prepareServicesWidget(): string
     {
         $services = $this->getAllServicesGrouped($this->getFilteredOrders());
+        if (!empty($services)) {
+            $links = [];
+            $total = 0;
+            foreach ($services as $val) {
+                $total += $val['co'];
+                $links[$val['id']] = '<span class="label-id">' . $val['co'] . '</span> ' . $val['name'];
+            }
 
-        $links = [];
-        $total = 0;
-        foreach ($services as $val){
-            $total+= $val['co'];
-            $links[$val['id']] = '<span class="label-id">'.$val['co'].'</span> '.$val['name'];
+            return DropdownWidget::widget([
+                'label' => Yii::t('orders', 'models.search.orderssearch.label.service'),
+                'items' => $links,
+                'url' => $this->getWidgetUrl(),
+                'addGetParam' => 'service_id',
+                'allTitle' => Yii::t('orders', 'models.search.orderssearch.all') . ' (' . $total . ')'
+            ]);
         }
-
-        return DropdownWidget::widget([
-            'label' => Yii::t('orders', 'models.search.orderssearch.label.service'),
-            'items' => $links,
-            'url' => ArrayHelper::merge(['/orders/orders/index'], $this->params),
-            'addGetParam' => 'service_id',
-            'allTitle' => Yii::t('orders', 'models.search.orderssearch.all').' ('.$total.')'
-        ]);
+        return '';
     }
 
     /**
@@ -165,13 +240,13 @@ class OrdersSearch extends Model
      * @return string
      * @throws Exception
      */
-    public function prepareModeWidget() :string
+    public function prepareModeWidget(): string
     {
         $items = Orders::modeLabels();
         return DropdownWidget::widget([
             'label' => Yii::t('orders', 'models.search.orderssearch.label.mode'),
             'items' => $items,
-            'url' => ArrayHelper::merge(['/orders/orders/index'], $this->params),
+            'url' => $this->getWidgetUrl(),
             'addGetParam' => 'mode',
             'allTitle' => Yii::t('orders', 'models.search.orderssearch.mode.all')
         ]);
@@ -194,14 +269,18 @@ class OrdersSearch extends Model
                 ['attribute' => 'link', 'label' => Yii::t('orders', 'csv.link')],
                 ['attribute' => 'quantity', 'label' => Yii::t('orders', 'csv.quantity')],
                 ['attribute' => 'name', 'label' => Yii::t('orders', 'csv.service_name')],
-                ['attribute' => 'status', 'label' => Yii::t('orders', 'csv.status'),
-                    'value' => function($model) use ($orders){
+                [
+                    'attribute' => 'status',
+                    'label' => Yii::t('orders', 'csv.status'),
+                    'value' => function ($model) use ($orders) {
                         $labels = $orders::statusLabels();
                         return $labels[$model['status']] ?? 'N/A';
                     }
                 ],
-                ['attribute' => 'mode', 'label' => Yii::t('orders', 'csv.mode'),
-                    'value' => function($model) use ($orders){
+                [
+                    'attribute' => 'mode',
+                    'label' => Yii::t('orders', 'csv.mode'),
+                    'value' => function ($model) use ($orders) {
                         $labels = $orders::modeLabels();
                         return $labels[$model['mode']] ?? 'N/A';
                     }
@@ -213,7 +292,7 @@ class OrdersSearch extends Model
                 ]
             ],
         ]);
-        $exporter->export()->send('Orders-'.date('Y.m.d-H:i:s').'.csv');
+        $exporter->export()->send('Orders-' . date('Y.m.d-H:i:s') . '.csv');
     }
 
     /**
@@ -221,15 +300,18 @@ class OrdersSearch extends Model
      * @param $ordersQuery
      * @return array
      */
-    public function getAllServicesGrouped($ordersQuery) :array
+    public function getAllServicesGrouped($ordersQuery): array
     {
+        if (empty($ordersQuery->select)) {
+            return [];
+        }
         $ordersQuery->select([
             'co' => 'COUNT(o.service_id)',
-            'name'  => 's.name',
-            'id'    => 'o.service_id'
+            'name' => 's.name',
+            'id' => 'o.service_id'
         ]);
 
-        $ordersQuery->from(['o' => 'orders']);
+        $ordersQuery->from(['o' => Orders::tableName()]);
         $ordersQuery->groupBy('o.service_id');
 
         //--remove service_id for correct widget
@@ -246,7 +328,7 @@ class OrdersSearch extends Model
      */
     public function arrayHelperRemoveByKey(&$array, $keySearch)
     {
-        if(!empty($array)) {
+        if (!empty($array)) {
             foreach ($array as $key => &$value) {
                 if (is_array($value)) {
                     self::arrayHelperRemoveByKey($value, $keySearch);

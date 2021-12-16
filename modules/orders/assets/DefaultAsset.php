@@ -2,6 +2,7 @@
 /**
  * Добавляем свои стили и т.д. из модуля
  */
+
 namespace orders\assets;
 
 use yii\web\AssetBundle;

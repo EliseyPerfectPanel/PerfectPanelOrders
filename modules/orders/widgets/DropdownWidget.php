@@ -46,13 +46,13 @@ class DropdownWidget extends Widget
     {
         parent::init();
 
-        if(empty($this->label)){
+        if (empty($this->label)) {
             $this->label = 'widgets.dropdown.label';
         }
-        if(!isset($this->allTitle)){
+        if (!isset($this->allTitle)) {
             $this->allTitle = 'widgets.dropdown.label.all';
         }
-        if(empty($this->addGetParam)){
+        if (empty($this->addGetParam)) {
             throw new Exception('Undefined param addGetParam');
         }
     }
@@ -66,9 +66,9 @@ class DropdownWidget extends Widget
         static $id = 1;
         $id++;
 
-        if(!empty($this->items) && is_array($this->items)) {
+        if (!empty($this->items) && is_array($this->items)) {
             $linkForFirstItem = $this->url;
-            if(isset($this->url[$this->addGetParam])){
+            if (isset($this->url[$this->addGetParam])) {
                 unset($linkForFirstItem[$this->addGetParam]);
             }
             $links = [];
@@ -83,8 +83,12 @@ class DropdownWidget extends Widget
 
             foreach ($this->items as $key => $val) {
                 $links[] = [
-                'label' => $val,
-                'url' => ArrayHelper::merge($this->url, !empty($this->addGetParam) ? [$this->addGetParam => $key] : null)];
+                    'label' => $val,
+                    'url' => ArrayHelper::merge(
+                        $this->url,
+                        !empty($this->addGetParam) ? [$this->addGetParam => $key] : null
+                    )
+                ];
             }
 
             return $this->render('dropdownWidget', [

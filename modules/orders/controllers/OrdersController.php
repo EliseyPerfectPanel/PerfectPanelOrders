@@ -19,7 +19,6 @@ class OrdersController extends Controller
      */
     public function actionIndex(): string
     {
-
         $ordersSearchModel = new OrdersSearch();
         $ordersSearchModel
             ->setParams(Yii::$app->request->get())
@@ -29,7 +28,7 @@ class OrdersController extends Controller
             'orders' => $ordersSearchModel->orders(),
             'statusMenuItems' => $ordersSearchModel->prepareStatusItems(),
             'servicesWidget' => $ordersSearchModel->prepareServicesWidget(),
-            'modeWidget' => $ordersSearchModel->prepareModeWidget()
+            'modeWidget' => $ordersSearchModel->prepareModeWidget(),
         ]);
     }
 

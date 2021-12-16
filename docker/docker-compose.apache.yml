@@ -3,4 +3,4 @@ services:
 
   php:
     ports:
-      - '8101:80'
+      - ${APACHE_PORT}

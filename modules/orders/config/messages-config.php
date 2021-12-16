@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Configuration file for 'yii message/extract' command.
  *

@@ -10,16 +10,17 @@ use orders\models\Orders;
  * @var string $servicesWidget HTML of services column widget
  * @var string $modeWidget HTML of mode column widget
  */
-
 ?>
-    <?= Menu::widget([
-            'options'   => ['class' => 'nav nav-tabs p-b'],
-            'items'     => $statusMenuItems,
-        ]);
-    ?>
-    <?= GridView::widget([
+<?= Menu::widget([
+    'options' => ['class' => 'nav nav-tabs p-b'],
+    'items' => $statusMenuItems,
+]);
+?>
+<?php
+if (!empty($orders->query)) {
+    echo GridView::widget([
         'dataProvider' => $orders,
-        'tableOptions'  => ['class' => 'table order-table'],
+        'tableOptions' => ['class' => 'table order-table'],
         'showFooter' => true,
         'layout' => '
             {items}
@@ -48,16 +49,16 @@ use orders\models\Orders;
                 'attribute' => 'services.name',
                 'format' => 'raw',
                 'label' => $servicesWidget,
-                'headerOptions' => ['class'=>'dropdown-th'],
+                'headerOptions' => ['class' => 'dropdown-th'],
                 'encodeLabel' => false,
-                'value' => function($model){
-                    return '<span class="label-id">id:'.$model['service_id'].'</span>'.$model['name'];
+                'value' => function ($model) {
+                    return '<span class="label-id">id:' . $model['service_id'] . '</span>' . $model['name'];
                 }
             ],
             [
                 'attribute' => 'status',
                 'label' => Yii::t('orders', 'views.orders.index.label.status'),
-                'value' => function($model) use ($statusMenuItems){
+                'value' => function ($model) use ($statusMenuItems) {
                     return isset($statusMenuItems[$model['status']]) ? $statusMenuItems[$model['status']]['label'] : 'N/A';
                 }
             ],
@@ -65,9 +66,9 @@ use orders\models\Orders;
                 'attribute' => 'mode',
                 'label' => $modeWidget,
                 'enableSorting' => false,
-                'headerOptions' => ['class'=>'dropdown-th'],
+                'headerOptions' => ['class' => 'dropdown-th'],
                 'encodeLabel' => false,
-                'value' => function($model){
+                'value' => function ($model) {
                     $labels = Orders::modeLabels();
                     return $labels[$model['mode']] ?? 'N/A';
                 }
@@ -80,4 +81,8 @@ use orders\models\Orders;
 
 
         ],
-    ]); ?>
+    ]);
+} else {
+    echo 'Some Error';
+}
+?>

@@ -16,10 +16,6 @@ services:
       - PHP_ENABLE_XDEBUG
       - TEST_RUNTIME_PATH=/tmp/runtime
     volumes:
-      #- ./tests:/tests:delegated
-      # Framework testing
-      #- ./_host-volumes/yii2:/yii2:delegated
-      # Application testing
       - ./../:/app:delegated
       # Composer cache
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
@@ -29,12 +25,12 @@ services:
     image: mysql:latest
     restart: always
     ports:
-      - "3306:3306"
+      - ${MYSQL_PORT}
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: username
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: orders
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     volumes:
       - ./.data/mysql:/var/lib/mysql
       - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
@@ -43,9 +39,9 @@ services:
     image: phpmyadmin
     restart: always
     ports:
-      - 8080:80
+      - ${PHPADMIN_PORT}
     environment:
       - PMA_ARBITRARY=1
-      - PMA_HOST=db
-      - PMA_USER=username
-      - PMA_PASSWORD=password
+      - PMA_HOST=${PHPADMIN_HOST}
+      - PMA_USER=${PHPADMIN_USER}
+      - PMA_PASSWORD=${PHPADMIN_PASSWORD}

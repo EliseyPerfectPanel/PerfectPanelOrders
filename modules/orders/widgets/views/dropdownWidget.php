@@ -12,7 +12,7 @@ use yii\widgets\Menu;
 <div class="dropdown">
     <button
             class="btn btn-th btn-default dropdown-toggle"
-            type="button" id="dropdownMenu<?=$id?>"
+            type="button" id="dropdownMenu<?= $id ?>"
             data-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="true">
@@ -20,10 +20,10 @@ use yii\widgets\Menu;
         <span class="caret"></span>
     </button>
     <?=
-        Menu::widget([
-            'options' => ['class' => 'dropdown-menu', 'aria-labelledby' => 'dropdownMenu' . $id],
-            'items' => $items,
-            'encodeLabels' => false
-        ]);
+    Menu::widget([
+        'options' => ['class' => 'dropdown-menu', 'aria-labelledby' => 'dropdownMenu' . $id],
+        'items' => $items,
+        'encodeLabels' => false
+    ]);
     ?>
 </div>

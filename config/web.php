@@ -1,6 +1,5 @@
 <?php
 
-$params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
@@ -8,34 +7,35 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => [
         //'log',
-        'orders\Bootstrap'
     ],
+    'language' => 'ru',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
-        '@orders'  => '@app/modules/orders'
+        '@npm' => '@vendor/npm-asset',
+        '@orders' => '@app/modules/orders'
     ],
     'components' => [
+        'i18n' => [
+            'translations' => [
+                'orders*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@orders/messages',
+                ]
+            ]
+        ],
+        'assetManager' => [
+            'bundles' => [
+                'yii\web\JqueryAsset' => [
+                    'sourcePath' => null,
+                    'js' => ['//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js']
+                ]
+            ],
+        ],
+        'formatter' => [
+            'datetimeFormat' => 'php:Y-m-d H:i:s',
+        ],
         'request' => [
-            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'Z08zOyjU2HQlGIxxTPOCnhRJEDYjHjUB',
-        ],
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
-        ],
-        'user' => [
-            'identityClass' => 'app\models\User',
-            'enableAutoLogin' => true,
-        ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
-        ],
-        'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
-            // send all mails to a file by default. You have to set
-            // 'useFileTransport' to false and configure a transport
-            // for the mailer to send real emails.
-            'useFileTransport' => true,
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -44,6 +44,13 @@ $config = [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
                 ],
+            ],
+        ],
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'rules' => [
+                'GET /orders' => 'orders/orders/index',
+                'GET /orders/csv' => 'orders/orders/csv',
             ],
         ],
         'db' => $db,
@@ -55,7 +62,7 @@ $config = [
             'layout' => '@orders/views/layouts/main',
         ],
     ],
-    'params' => $params,
+    'params' => [],
 ];
 
 if (YII_ENV_DEV) {

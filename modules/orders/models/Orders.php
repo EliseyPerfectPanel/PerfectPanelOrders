@@ -19,18 +19,28 @@ use yii\db\ActiveRecord;
  */
 class Orders extends ActiveRecord
 {
+    public const STATUS_PENDING = 0;
+    public const STATUS_IN_PROGRESS = 1;
+    public const STATUS_COMPLETED = 2;
+    public const STATUS_CANCELED = 3;
+    public const STATUS_FAIL = 4;
+
+    public const MODE_MANUAL = 0;
+    public const MODE_AUTO = 1;
+
+
     /**
      * Possible status keys
      * @return array
      */
-    public static function statusLabels() :array
+    public static function statusLabels(): array
     {
         return [
-            0 => Yii::t('orders', 'models.orders.status.label.pending'),
-            1 => Yii::t('orders', 'models.orders.status.label.in_progress'),
-            2 => Yii::t('orders', 'models.orders.status.label.completed'),
-            3 => Yii::t('orders', 'models.orders.status.label.canceled'),
-            4 => Yii::t('orders', 'models.orders.status.label.fail')
+            static::STATUS_PENDING => Yii::t('orders', 'models.orders.status.label.pending'),
+            static::STATUS_IN_PROGRESS => Yii::t('orders', 'models.orders.status.label.in_progress'),
+            static::STATUS_COMPLETED => Yii::t('orders', 'models.orders.status.label.completed'),
+            static::STATUS_CANCELED => Yii::t('orders', 'models.orders.status.label.canceled'),
+            static::STATUS_FAIL => Yii::t('orders', 'models.orders.status.label.fail')
         ];
     }
 
@@ -38,18 +48,18 @@ class Orders extends ActiveRecord
      * Possible mode keys
      * @return array
      */
-    public static function modeLabels() :array
+    public static function modeLabels(): array
     {
         return [
-            0 => Yii::t('orders', 'models.orders.label.dropdown.manual'),
-            1 => Yii::t('orders', 'models.orders.label.dropdown.auto'),
+            static::MODE_MANUAL => Yii::t('orders', 'models.orders.label.dropdown.manual'),
+            static::MODE_AUTO => Yii::t('orders', 'models.orders.label.dropdown.auto'),
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName() :string
+    public static function tableName(): string
     {
         return 'orders';
     }
@@ -57,7 +67,7 @@ class Orders extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules() :array
+    public function rules(): array
     {
         return [
             [['user_id', 'link', 'quantity', 'service_id', 'status', 'created_at', 'mode'], 'required'],
@@ -69,7 +79,7 @@ class Orders extends ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels() :array
+    public function attributeLabels(): array
     {
         return [
             'id' => Yii::t('orders', 'models.orders.label.id'),
