@@ -61,4 +61,5 @@ return [
     'views.orders.index.label.status' => 'Status',
     'views.orders.index.label.user' => 'User',
     '{begin} to {end} of {totalCount}' => '{begin} to {end} of {totalCount}',
+    'orders.widgets.status.label.all' => 'All',
 ];

@@ -1,16 +1,18 @@
 <?php
-/*
- * Widget for generating a drop-down menu
- */
 
 namespace orders\widgets;
+
+/*
+ * Widget for status menu :)
+ */
+
 
 use yii;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 use yii\base\Exception;
 
-class DropdownWidget extends Widget
+class StatusMenu extends Widget
 {
 
     /**
@@ -23,26 +25,30 @@ class DropdownWidget extends Widget
      */
     public $items;
     /**
-     * @var array Base url ['test/test', 'id' => 1]
-     */
-    public $url;
-    /**
      * @var string parameter to add to the link as $_GET
      */
     public $addGetParam;
-    /**
-     * @var string  Label for dropdown menu
-     */
-    public $label;
     /**
      * @var string Label for default title. For the first item
      */
     public $allTitle;
     /**
-     * @var string If need custom template for link
-     * example <a href="{url}" class="ico ico-about">{label}</a>
+     * @var Model Model with form
      */
-    public $template_a;
+    public $form;
+    /**
+     * @var array Options form Widget Menu
+     */
+    public $options;
+    /**
+     * @var array Precooked url
+     */
+    public $url;
+    /**
+     * @var array Url For use in form
+     */
+    public $downloadLink;
+
 
     /**
      * @throws Exception
@@ -50,12 +56,8 @@ class DropdownWidget extends Widget
     public function init()
     {
         parent::init();
-
-        if (empty($this->label)) {
-            $this->label = Yii::t('orders', 'widgets.dropdown.label');
-        }
         if (!isset($this->allTitle)) {
-            $this->allTitle = Yii::t('orders', 'widgets.dropdown.label.all');
+            $this->allTitle = Yii::t('orders', 'widgets.default.label.all');
         }
         if (empty($this->addGetParam)) {
             throw new Exception('Undefined param addGetParam');
@@ -72,41 +74,45 @@ class DropdownWidget extends Widget
         $id++;
 
         if (!empty($this->items) && is_array($this->items)) {
-            $linkForFirstItem = $this->url;
-            if (isset($this->url[$this->addGetParam])) {
-                unset($linkForFirstItem[$this->addGetParam]);
-            }
             $links = [];
-            $links['all'] = [
-                'label' => $this->allTitle,
-                'url' => $linkForFirstItem,
+            $links[] = [
+                'label' => Yii::t('orders', $this->allTitle),
+                'url' => $this->url,
                 //-- remove active trail from first link
                 'active' => !empty($this->addGetParam) ? function () {
                     return !(yii::$app->request->get($this->addGetParam) !== null);
                 } : null
             ];
-            if (!empty($this->template_a)) {
-                ArrayHelper::setValue($links, '0.template', ['template' => $this->template_a]);
-            }
-
 
             foreach ($this->items as $key => $val) {
-                $links['item' . $key] = [
+                $links[] = [
                     'label' => $val,
                     'url' => ArrayHelper::merge(
                         $this->url,
                         !empty($this->addGetParam) ? [$this->addGetParam => $key] : null
                     )
                 ];
-                if (!empty($this->template_a)) {
-                    $links['item' . $key]['template'] = $this->template_a;
-                }
             }
 
-            return $this->render('dropdownWidget', [
+            if (!empty($this->form)) {
+                $links[] = [
+                    'template' => yii::$app->view->render(
+                        '@orders/views/orders/_search',
+                        [
+                            'model' => $this->form,
+                            'downloadLink' => $this->downloadLink
+                        ]
+                    ),
+                    'options' => [
+                        'class' => 'pull-right custom-search'
+                    ]
+                ];
+            }
+
+            return $this->render('statusMenu', [
                 'id' => $id,
-                'label' => $this->label,
-                'items' => $links
+                'items' => $links,
+                'options' => $this->options
             ]);
         } else {
             return '';

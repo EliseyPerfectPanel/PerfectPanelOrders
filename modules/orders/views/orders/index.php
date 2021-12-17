@@ -1,7 +1,8 @@
 <?php
 
+use orders\widgets\DropdownWidget;
+use orders\widgets\StatusMenu;
 use yii\grid\GridView;
-use yii\widgets\Menu;
 use orders\models\Orders;
 
 /**
@@ -9,11 +10,19 @@ use orders\models\Orders;
  * @var array $orders DataProvider with filtered orders
  * @var string $servicesWidget HTML of services column widget
  * @var string $modeWidget HTML of mode column widget
+ * @var \yii\base\Model $searchForm
+ * @var array $url Base url for all Items widgets with params
+ * @var array $downloadLink Download Link
  */
 ?>
-<?= Menu::widget([
+<?= StatusMenu::widget([
     'options' => ['class' => 'nav nav-tabs p-b'],
     'items' => $statusMenuItems,
+    'allTitle' => 'orders.widgets.status.label.all',
+    'form' => $searchForm,
+    'addGetParam' => 'status',
+    'url' => ['/orders/orders/index'],
+    'downloadLink' => $downloadLink
 ]);
 ?>
 <?php
@@ -48,23 +57,40 @@ if (!empty($orders->query)) {
             [
                 'attribute' => 'services.name',
                 'format' => 'raw',
-                'label' => $servicesWidget,
+                'label' => !empty($servicesItems) ? DropdownWidget::widget([
+                    'label' => Yii::t('orders', 'models.search.orderssearch.label.service'),
+                    'items' => $servicesItems['items'],
+                    'url' => $url,
+                    'addGetParam' => 'service_id',
+                    'allTitle' => Yii::t(
+                            'orders',
+                            'models.search.orderssearch.all'
+                        ) . ' (' . $servicesItems['total'] . ')'
+                ]) : '',
                 'headerOptions' => ['class' => 'dropdown-th'],
                 'encodeLabel' => false,
                 'value' => function ($model) {
                     return '<span class="label-id">id:' . $model['service_id'] . '</span>' . $model['name'];
                 }
+
             ],
             [
                 'attribute' => 'status',
                 'label' => Yii::t('orders', 'views.orders.index.label.status'),
                 'value' => function ($model) use ($statusMenuItems) {
-                    return isset($statusMenuItems[$model['status']]) ? $statusMenuItems[$model['status']]['label'] : 'N/A';
+                    return $statusMenuItems[$model['status']] ?? 'N/A';
                 }
             ],
             [
                 'attribute' => 'mode',
-                'label' => $modeWidget,
+                'label' => DropdownWidget::widget([
+                    'label' => Yii::t('orders', 'models.search.orderssearch.label.mode'),
+                    'items' => Orders::modeLabels(),
+                    'url' => $url,
+                    'addGetParam' => 'mode',
+                    'allTitle' => Yii::t('orders', 'models.search.orderssearch.mode.all')
+                ])
+                ,
                 'enableSorting' => false,
                 'headerOptions' => ['class' => 'dropdown-th'],
                 'encodeLabel' => false,

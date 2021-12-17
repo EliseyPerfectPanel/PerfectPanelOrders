@@ -7,7 +7,7 @@ use yii\helpers\ArrayHelper;
 /* @var $this yii\web\View */
 /* @var $model orders\models\search\SearchForm */
 /* @var $form yii\widgets\ActiveForm */
-/* @var $url array */
+/* @var $downloadLink array */
 
 ?>
 <?php
@@ -29,7 +29,7 @@ $form = ActiveForm::begin([
 ]); ?>
 <?= Html::a(
     Yii::t('orders', 'views.orders._search.download'),
-    $url,
+    $downloadLink,
     ['class' => 'btn btn-success']
 ) ?>
 <div class="input-group">

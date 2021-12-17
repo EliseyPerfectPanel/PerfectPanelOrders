@@ -3,6 +3,7 @@
 namespace orders\controllers;
 
 use Exception;
+use orders\models\search\SearchForm;
 use yii;
 use orders\models\search\OrdersSearch;
 use yii\web\Controller;
@@ -24,11 +25,16 @@ class OrdersController extends Controller
             ->setParams(Yii::$app->request->get())
             ->setParams(['pageSize' => 100]);
 
+        $searchForm = new SearchForm();
+        $searchForm->load(Yii::$app->request->get());
+
         return $this->render('index', [
             'orders' => $ordersSearchModel->orders(),
+            'url' => $ordersSearchModel->getWidgetUrl(),
+            'downloadLink' => $ordersSearchModel->getDownloadLink(),
+            'searchForm' => $searchForm,
             'statusMenuItems' => $ordersSearchModel->prepareStatusItems(),
-            'servicesWidget' => $ordersSearchModel->prepareServicesWidget(),
-            'modeWidget' => $ordersSearchModel->prepareModeWidget(),
+            'servicesItems' => $ordersSearchModel->prepareServicesWidget(),
         ]);
     }
 
@@ -37,11 +43,11 @@ class OrdersController extends Controller
      * @return bool
      * @throws yii\base\InvalidConfigException
      */
-    public function actionCsv(): bool
+    public function actionCsv()
     {
         $ordersSearchModel = new OrdersSearch();
         $ordersSearchModel->setParams(Yii::$app->request->get());
-        $ordersSearchModel->getCsv();
+        return $ordersSearchModel->getCsv();
         return true;
     }
 }

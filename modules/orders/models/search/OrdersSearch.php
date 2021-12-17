@@ -6,7 +6,6 @@ use Exception;
 use orders\models\Orders;
 use orders\models\Services;
 use orders\models\Users;
-use orders\widgets\DropdownWidget;
 use yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -73,6 +72,14 @@ class OrdersSearch extends Model
     {
         return ArrayHelper::merge(
             ['/orders/orders/index'],
+            array_intersect_key($this->params, array_flip(self::availableGetParams()))
+        );
+    }
+
+    public function getDownloadLink(): array
+    {
+        return ArrayHelper::merge(
+            ['/orders/orders/csv'],
             array_intersect_key($this->params, array_flip(self::availableGetParams()))
         );
     }
@@ -171,49 +178,15 @@ class OrdersSearch extends Model
      */
     public function prepareStatusItems(): array
     {
-        $links = [];
-        $links['all'] = [
-            'label' => Yii::t('orders', 'models.search.orderssearch.label.all'),
-            'url' => ['/orders/orders/index'],
-            //-- remove active trail from first link
-            'active' => function () {
-                return !(ArrayHelper::getValue($this->params, 'status') !== null);
-            }
-        ];
-
-        foreach (Orders::statusLabels() as $key => $val) {
-            $links[$key] = [
-                'label' => $val,
-                'url' => ['/orders/orders/index', 'status' => $key],
-                'template' => '<a href="{url}" class="ico ico-about">{label}</a>'
-            ];
-        }
-
-        //-- add Search Form in <li>
-        $form = new SearchForm();
-        $form->load($this->params);
-        $links['form'] = [
-            'template' => yii::$app->view->render(
-                '@orders/views/orders/_search',
-                [
-                    'model' => $form,
-                    'url' => $this->getWidgetUrl()
-                ]
-            ),
-            'options' => [
-                'class' => 'pull-right custom-search'
-            ]
-        ];
-
-        return $links;
+        return Orders::statusLabels();
     }
 
     /**
-     * Return Services' widget HTML
-     * @return string
+     * Services' widget HTML
+     * @return array
      * @throws Exception
      */
-    public function prepareServicesWidget(): string
+    public function prepareServicesWidget(): array
     {
         $services = $this->getAllServicesGrouped($this->getFilteredOrders());
         if (!empty($services)) {
@@ -224,32 +197,12 @@ class OrdersSearch extends Model
                 $links[$val['id']] = '<span class="label-id">' . $val['co'] . '</span> ' . $val['name'];
             }
 
-            return DropdownWidget::widget([
-                'label' => Yii::t('orders', 'models.search.orderssearch.label.service'),
+            return [
                 'items' => $links,
-                'url' => $this->getWidgetUrl(),
-                'addGetParam' => 'service_id',
-                'allTitle' => Yii::t('orders', 'models.search.orderssearch.all') . ' (' . $total . ')'
-            ]);
+                'total' => $total
+            ];
         }
-        return '';
-    }
-
-    /**
-     * Return Mode widget HTML
-     * @return string
-     * @throws Exception
-     */
-    public function prepareModeWidget(): string
-    {
-        $items = Orders::modeLabels();
-        return DropdownWidget::widget([
-            'label' => Yii::t('orders', 'models.search.orderssearch.label.mode'),
-            'items' => $items,
-            'url' => $this->getWidgetUrl(),
-            'addGetParam' => 'mode',
-            'allTitle' => Yii::t('orders', 'models.search.orderssearch.mode.all')
-        ]);
+        return [];
     }
 
     /**

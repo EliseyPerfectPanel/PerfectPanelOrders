@@ -16,7 +16,7 @@ use yii\widgets\Menu;
             data-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="true">
-        <?= Html::encode(Yii::t('orders', $label)) ?>
+        <?= Html::encode($label) ?>
         <span class="caret"></span>
     </button>
     <?=

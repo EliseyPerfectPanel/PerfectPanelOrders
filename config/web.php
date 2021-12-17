@@ -48,6 +48,7 @@ $config = [
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
+            'showScriptName' => false,
             'rules' => [
                 'GET /orders' => 'orders/orders/index',
                 'GET /orders/csv' => 'orders/orders/csv',
